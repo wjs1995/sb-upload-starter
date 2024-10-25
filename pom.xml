@@ -5,8 +5,8 @@
     <groupId>cloud.xiaoweiyun</groupId>
     <artifactId>sb-upload-starter</artifactId>
     <version>0.0.1</version>
-    <name>sb-uploader</name>
-    <description>sb-uploader</description>
+    <name>sb-upload-starter</name>
+    <description>sb-upload-starter</description>
     <url>https://github.com/wjs1995/sb-upload-starter</url>
     <licenses>
         <license>
@@ -48,6 +48,12 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.aliyun.oss</groupId>
+            <artifactId>aliyun-sdk-oss</artifactId>
+            <version>3.18.1</version>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>
@@ -58,6 +64,8 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
+
         </dependencies>
     </dependencyManagement>
 
@@ -100,7 +108,6 @@
                 <extensions>true</extensions>
                 <configuration>
                     <publishingServerId>wangjinsheng</publishingServerId>
-                    <tokenAuth>true</tokenAuth>
                 </configuration>
             </plugin>
 
@@ -109,6 +116,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.10.1</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -123,11 +131,31 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
                         <goals>
                             <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.6</version>
+                <configuration>
+                    <executable>D:\MySoftWare\GnuPG\bin\gpg</executable>
+                    <keyname>wangjinsheng</keyname>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
                         </goals>
                     </execution>
                 </executions>
