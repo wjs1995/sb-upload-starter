@@ -1,6 +1,7 @@
 package cloud.xiaoweiyun.config;
 
 import cloud.xiaoweiyun.vo.StsTokenVo;
+import cloud.xiaoweiyun.vo.UpLoadVo;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.OSSException;
@@ -37,19 +38,34 @@ public class AliOSSUtils {
     private AliOSSProperties aliOSSProperties;
 
 
-    public String upload(MultipartFile file) throws IOException, ClientException {
+    public UpLoadVo upload(MultipartFile file)  {
         String endpoint = aliOSSProperties.getEndpoint();
         String bucketName = aliOSSProperties.getBucketName();
-        InputStream inputStream = file.getInputStream();
+        InputStream inputStream = null;
+        try {
+            inputStream = file.getInputStream();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         String originalFilename = file.getOriginalFilename();
         String newFileName = UUID.randomUUID() +originalFilename.substring(originalFilename.lastIndexOf('.'));
 
-        EnvironmentVariableCredentialsProvider credentialsProvider = CredentialsProviderFactory.newEnvironmentVariableCredentialsProvider();
+        EnvironmentVariableCredentialsProvider credentialsProvider = null;
+        try {
+            credentialsProvider = CredentialsProviderFactory.newEnvironmentVariableCredentialsProvider();
+        } catch (ClientException e) {
+            throw new RuntimeException(e);
+        }
         OSS ossClient = new OSSClientBuilder().build(endpoint,credentialsProvider);
         try {
             PutObjectResult putObjectResult = ossClient.putObject(bucketName, newFileName, inputStream);
             String url = endpoint.split("//")[0] + "//" + bucketName + "." + endpoint.split("//")[1] + "/" + newFileName;
-            return url;
+            UpLoadVo upLoadVo = new UpLoadVo();
+            upLoadVo.setEndpoint(endpoint);
+            upLoadVo.setBucketName(bucketName);
+            upLoadVo.setFileName(newFileName);
+            upLoadVo.setUrl(url);
+            return upLoadVo;
         } catch (OSSException oe) {
             System.out.println("Caught an OSSException, which means your request made it to OSS, "
                     + "but was rejected with an error response for some reason.");
@@ -67,7 +83,7 @@ public class AliOSSUtils {
                 ossClient.shutdown();
             }
         }
-        return "";
+        return null;
     }
 
     public StsTokenVo getStsToken() {
