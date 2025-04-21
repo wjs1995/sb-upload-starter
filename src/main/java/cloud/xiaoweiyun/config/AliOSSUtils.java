@@ -1,6 +1,6 @@
 package cloud.xiaoweiyun.config;
 
-import cloud.xiaoweiyun.dto.StsTokenVo;
+import cloud.xiaoweiyun.vo.StsTokenVo;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.OSSException;
@@ -14,6 +14,8 @@ import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -22,6 +24,8 @@ import java.util.UUID;
 
 
 public class AliOSSUtils {
+    private static final Logger log = LoggerFactory.getLogger(AliOSSUtils.class);
+
     public AliOSSProperties getAliOSSProperties() {
         return aliOSSProperties;
     }
@@ -68,14 +72,18 @@ public class AliOSSUtils {
 
     public StsTokenVo getStsToken() {
         String endpoint = aliOSSProperties.getStsEndpoint();
+        log.info("endpoint:{}",endpoint);
+
         // STS服务接入点，例如sts.cn-hangzhou.aliyuncs.com。您可以通过公网或者VPC接入STS服务。
 //        String endpoint = "sts.cn-hangzhou.aliyuncs.com";
         // 从环境变量中获取步骤1生成的RAM用户的访问密钥（AccessKey ID和AccessKey Secret）。
         String accessKeyId = System.getenv("OSS_ACCESS_KEY_ID");
+        log.info("accessKeyId:{}",accessKeyId);
         String accessKeySecret = System.getenv("OSS_ACCESS_KEY_SECRET");
+        log.info("accessKeySecret:{}",accessKeySecret);
         // 从环境变量中获取步骤3生成的RAM角色的RamRoleArn。
         String roleArn = System.getenv("OSS_STS_ROLE_ARN");
-
+        log.info("roleArn:{}",roleArn);
         // 自定义角色会话名称，用来区分不同的令牌，例如可填写为SessionTest。
         String roleSessionName = "TemporaryRole";
         // 临时访问凭证将获得角色拥有的所有权限。
@@ -85,9 +93,10 @@ public class AliOSSUtils {
         Long durationSeconds = 3600L;
         try {
             // 发起STS请求所在的地域。建议保留默认值，默认值为空字符串（""）。
-            String regionId = "";
+            String regionId = aliOSSProperties.getRegion();
+//            log.info("regionId:{}",regionId);
             // 添加endpoint。适用于Java SDK 3.12.0及以上版本。
-            DefaultProfile.addEndpoint(regionId, "Sts", endpoint);
+//            DefaultProfile.addEndpoint(regionId, "Sts", endpoint);
             // 添加endpoint。适用于Java SDK 3.12.0以下版本。
             // DefaultProfile.addEndpoint("",regionId, "Sts", endpoint);
             // 构造default profile。
@@ -101,7 +110,7 @@ public class AliOSSUtils {
             // request.setMethod(MethodType.POST);
             request.setRoleArn(roleArn);
             request.setRoleSessionName(roleSessionName);
-            request.setPolicy(null);
+            request.setPolicy(policy);
             request.setDurationSeconds(durationSeconds);
             final AssumeRoleResponse response = client.getAcsResponse(request);
 
@@ -117,6 +126,7 @@ public class AliOSSUtils {
             System.out.println("Error code: " + e.getErrCode());
             System.out.println("Error message: " + e.getErrMsg());
             System.out.println("RequestId: " + e.getRequestId());
+            System.out.println("message: " + e.getMessage());
             return null;
         }
     }

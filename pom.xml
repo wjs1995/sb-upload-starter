@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>cloud.xiaoweiyun</groupId>
     <artifactId>sb-upload-starter</artifactId>
-    <version>0.0.5</version>
+    <version>0.0.6</version>
     <name>sb-upload-starter</name>
     <description>sb-upload-starter</description>
     <url>https://github.com/wjs1995/sb-upload-starter</url>

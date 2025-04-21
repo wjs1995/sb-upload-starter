@@ -8,6 +8,14 @@ public class AliOSSProperties {
     private String endpoint;
 
     private String bucketName;
+    private String region;
+
+    public void setRegion(String region) {
+        this.region = region;
+    }
+    public String getRegion() {
+        return region;
+    }
 
     public String getStsEndpoint() {
         return stsEndpoint;

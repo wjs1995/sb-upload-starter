@@ -1,4 +1,4 @@
-package cloud.xiaoweiyun.dto;
+package cloud.xiaoweiyun.vo;
 
 public class StsTokenVo {
 
